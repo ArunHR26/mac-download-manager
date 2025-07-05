@@ -669,40 +669,92 @@ func extractFilenameFromURL(_ urlString: String) -> String {
 
 func main() {
     let args = CommandLine.arguments
-    guard args.count >= 2 else {
-        print("Usage: swift smart_downloader.swift <URL> [output_file] [connections]")
+    
+    // Handle help flag
+    if args.contains("--help") || args.contains("-h") {
+        print("🚀 Mac Download Manager v1.0.0")
+        print("")
+        print("Usage: mac-download-manager <URL> [options]")
+        print("")
+        print("Options:")
+        print("  -o, --output <file>     Specify output filename")
+        print("  -c, --connections <n>   Specify number of connections (1-8)")
+        print("  -h, --help             Show this help message")
+        print("")
         print("Examples:")
-        print("  swift smart_downloader.swift https://example.com/file.zip")
-        print("  swift smart_downloader.swift https://example.com/file.zip myfile.zip")
-        print("  swift smart_downloader.swift https://example.com/file.zip myfile.zip 4")
+        print("  mac-download-manager https://example.com/file.zip")
+        print("  mac-download-manager https://example.com/file.zip -o myfile.zip")
+        print("  mac-download-manager https://example.com/file.zip -c 4")
+        print("  mac-download-manager https://example.com/file.zip -o myfile.zip -c 4")
         print("")
         print("Features:")
-        print("- Uses original filename from URL if output_file is not specified")
-        print("- Auto-detects optimal connections (if not specified)")
-        print("- Quick speed test before download")
+        print("- Smart connection optimization")
+        print("- Parallel downloads with resume support")
         print("- Progress tracking with speed and ETA")
+        print("- File type detection")
         print("- Ctrl+C to cancel")
         return
     }
     
-    let url = args[1]
-    let output: String
-    let userConnections: Int?
-    if args.count == 2 {
-        output = extractFilenameFromURL(url)
-        userConnections = nil
-    } else if args.count == 3, let connections = Int(args[2]) {
-        output = extractFilenameFromURL(url)
-        userConnections = connections
-    } else if args.count == 3 {
-        output = args[2]
-        userConnections = nil
-    } else {
-        output = args[2]
-        userConnections = Int(args[3])
+    // Parse arguments
+    var url: String?
+    var output: String?
+    var userConnections: Int?
+    
+    var i = 1
+    while i < args.count {
+        let arg = args[i]
+        
+        switch arg {
+        case "-o", "--output":
+            if i + 1 < args.count {
+                output = args[i + 1]
+                i += 2
+            } else {
+                print("❌ Error: -o/--output requires a filename")
+                return
+            }
+        case "-c", "--connections":
+            if i + 1 < args.count {
+                if let connections = Int(args[i + 1]) {
+                    userConnections = connections
+                    i += 2
+                } else {
+                    print("❌ Error: -c/--connections requires a number")
+                    return
+                }
+            } else {
+                print("❌ Error: -c/--connections requires a number")
+                return
+            }
+        case "-h", "--help":
+            // Already handled above
+            return
+        default:
+            if arg.hasPrefix("-") {
+                print("❌ Error: Unknown option '\(arg)'")
+                print("Use --help for usage information")
+                return
+            } else if url == nil {
+                url = arg
+                i += 1
+            } else {
+                print("❌ Error: Multiple URLs specified")
+                return
+            }
+        }
     }
     
-    globalDownloader = SmartDownloader(outputPath: output)
+    guard let url = url else {
+        print("❌ Error: URL is required")
+        print("Use --help for usage information")
+        return
+    }
+    
+    // Set default output filename if not specified
+    let finalOutput = output ?? extractFilenameFromURL(url)
+    
+    globalDownloader = SmartDownloader(outputPath: finalOutput)
     
     // Handle Ctrl+C for cancellation
     signal(SIGINT, signalHandler)
