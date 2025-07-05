@@ -9,11 +9,12 @@ struct ChunkInfo {
     let start: Int64
     let end: Int64
     let path: String
+    var downloadedBytes: Int64 = 0
     var downloaded: Int64 {
         if let attr = try? FileManager.default.attributesOfItem(atPath: path), let size = attr[.size] as? Int64 {
             return size
         }
-        return 0
+        return downloadedBytes
     }
     var isComplete: Bool { downloaded >= (end - start + 1) }
 }
@@ -209,6 +210,7 @@ class SmartDownloader: NSObject, URLSessionDownloadDelegate {
         }
         
         if completedChunks >= totalChunks {
+            print() // Add newline after progress
             mergeChunks()
             exit(0)
         }
@@ -257,6 +259,7 @@ class SmartDownloader: NSObject, URLSessionDownloadDelegate {
             downloadedBytes += (info.end - info.start + 1) - info.downloaded
             updateProgress()
             if completedChunks >= totalChunks {
+                print() // Add newline after progress
                 mergeChunks()
                 exit(0)
             }
@@ -305,13 +308,16 @@ class SmartDownloader: NSObject, URLSessionDownloadDelegate {
                 let chunkSize = info.end - info.start + 1
                 let chunkDownloaded = Int64(Double(chunkSize) * chunkProgress)
                 
+                // Update chunk info with current progress
+                chunkInfos[chunkIndex] = ChunkInfo(index: info.index, start: info.start, end: info.end, path: info.path, downloadedBytes: chunkDownloaded)
+                
                 // Update total progress
                 downloadedBytes = chunkInfos.enumerated().reduce(0) { sum, element in
                     let (index, info) = element
                     if index == chunkIndex {
                         return sum + chunkDownloaded
                     } else {
-                        return sum + info.downloaded
+                        return sum + info.downloadedBytes
                     }
                 }
                 updateProgress()
@@ -347,7 +353,7 @@ class SmartDownloader: NSObject, URLSessionDownloadDelegate {
         
         // Throttle progress updates to avoid overwhelming output
         let now = Date()
-        if now.timeIntervalSince(lastProgressUpdate) < 0.1 { return }
+        if now.timeIntervalSince(lastProgressUpdate) < 0.2 { return }
         lastProgressUpdate = now
         
         let percentage = min(Double(downloadedBytes) / Double(totalBytes) * 100, 100.0)
@@ -357,7 +363,8 @@ class SmartDownloader: NSObject, URLSessionDownloadDelegate {
         let downloadedStr = formatBytes(downloadedBytes)
         let speedStr = speed
         
-        print("\r📊 Progress: \(String(format: "%.1f", percentage))% | \(downloadedStr)/\(formatBytes(totalBytes)) | Speed: \(speedStr) | ETA: \(eta)", terminator: "")
+        // Clear the line and print progress
+        print("\r\033[K📊 Progress: \(String(format: "%.1f", percentage))% | \(downloadedStr)/\(formatBytes(totalBytes)) | Speed: \(speedStr) | ETA: \(eta)", terminator: "")
         fflush(stdout)
     }
     
