@@ -1,4 +1,4 @@
-# Smart Downloader
+# Mac Download Manager
 
 A fast, intelligent command-line downloader for macOS with parallel downloads, resume capability, and automatic file type detection.
 
@@ -15,7 +15,7 @@ A fast, intelligent command-line downloader for macOS with parallel downloads, r
 
 ### Homebrew (Recommended)
 ```bash
-brew install ARUNHR26/mac-download-manager/smart-downloader
+brew install ARUNHR26/mac-download-manager/mac-download-manager
 ```
 
 ### Manual Installation
@@ -29,22 +29,22 @@ sudo mv SmartDownloader /usr/local/bin/
 
 ### Basic Usage
 ```bash
-smart-downloader <URL> [output_file] [connections]
+mac-download-manager <URL> [output_file] [connections]
 ```
 
 ### Examples
 ```bash
 # Download with auto-detected optimal connections
-smart-downloader https://example.com/file.zip
+mac-download-manager https://example.com/file.zip
 
 # Download with custom filename
-smart-downloader https://example.com/file.zip myfile.zip
+mac-download-manager https://example.com/file.zip myfile.zip
 
 # Download with specific number of connections
-smart-downloader https://example.com/file.zip myfile.zip 4
+mac-download-manager https://example.com/file.zip myfile.zip 4
 
 # Download with auto filename and custom connections
-smart-downloader https://example.com/file.zip 3
+mac-download-manager https://example.com/file.zip 3
 ```
 
 ### Features
