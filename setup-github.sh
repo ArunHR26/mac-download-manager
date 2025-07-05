@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# GitHub Setup Script for Smart Downloader
-echo "🚀 Setting up GitHub repository for Smart Downloader"
+# GitHub Setup Script for Mac Download Manager
+echo "🚀 Setting up GitHub repository for Mac Download Manager"
 
 # Check if git is initialized
 if [ ! -d ".git" ]; then
@@ -15,7 +15,7 @@ git add .
 
 # Initial commit
 echo "💾 Creating initial commit..."
-git commit -m "Initial commit: Smart Downloader CLI tool
+git commit -m "Initial commit: Mac Download Manager CLI tool
 
 - Fast parallel downloads with auto-connection optimization
 - Resume capability for interrupted downloads
@@ -39,7 +39,7 @@ echo "6. Create a release:"
 echo "   - Go to your repository on GitHub"
 echo "   - Click 'Releases' → 'Create a new release'"
 echo "   - Tag: v1.0.0"
-echo "   - Title: Smart Downloader v1.0.0"
-echo "   - Upload the binary: .build/release/SmartDownloader"
+echo "   - Title: Mac Download Manager v1.0.0"
+echo "   - Upload the binary: .build/release/MacDownloadManager"
 echo ""
 echo "7. Update the Homebrew formula with your actual GitHub username and SHA256" 
