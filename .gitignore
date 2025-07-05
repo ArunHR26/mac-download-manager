@@ -13,3 +13,8 @@ DerivedData/
 *.gz
 test-*
 download-*
+# Shell scripts (utility files, not part of core project)
+test-installation.sh
+create-release.sh
+setup-github.sh
+setup-homebrew-tap.sh
